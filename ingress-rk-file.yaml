@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingres-rukesh
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "hello.com"
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: rukesh-svc
+            port:
+              number: 80

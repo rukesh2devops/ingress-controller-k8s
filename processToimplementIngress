@@ -1,0 +1,63 @@
+1. Install Ingress Controller:-
+   -> https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/cloud/deploy.yaml
+
+2. Change the deployment container IP added to take host ip address of the worker-node rather than bridge network
+
+3. Edit the ingress controller deployment and add this line "hostNetwork: ture" just above the containers so that the ingress will take Node IP Adress
+   
+   kubectl edit deployment ingress-nginx-controller -n ingress-nginx
+
+     spec:
+      hostNetwork: true
+      containers:
+      - args:
+        - /nginx-ingress-controller
+        - --publish-service=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --election-id=ingress-controller-leader
+        - --controller-class=k8s.io/ingress-nginx
+        - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --validating-webhook=:8443
+        - --validating-webhook-certificate=/usr/local/certificates/cert
+        - --validating-webhook-key=/usr/local/certificates/key
+        env:
+        - name: POD_NAME
+
+
+4. kubectl create deployment rukesh --image=nginx --replicas=2
+5. kubectl expose deployment rukesh --name=rukesh-svc --port=80
+
+6. Go in rukesh container kubectl exec -it rukesh-cjdrueyx bash
+   # echo "This is Rukesh and we welcome you" > /usr/share/nginx/html/index.html
+
+7 Create ingress rule, go on kubernetes.io and seach ingress get template:- 
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wildcard-host
+spec:
+  ingressClassName: nginx-example
+  rules:
+  - host: "foo.bar.com"
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: rukesh-svc
+            port:
+              number: 80
+
+
+
+add this link ingressClassName: nginx since ingressclass is named as "nginx"
+
+
+8. Go to master node and add "workernodeIP foo.bar.com" in /etc/hosts file of master node for testing. The worker node ip is where the ingress pod is running.
+
+9. now check it on master node
+
+  # curl foo.bar.com         # if we get result "This is Rukesh and we welcome you" then we are good our ingress is working fine.
+
+10. Thank You.
