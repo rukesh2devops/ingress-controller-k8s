@@ -1,5 +1,6 @@
 1. Install Ingress Controller:-
    -> https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/cloud/deploy.yaml
+   OR  git@github.com:rukesh2devops/ingress-controller-k8s.git     (only deploy.yaml is main file)
 
 2. Change the deployment container IP added to take host ip address of the worker-node rather than bridge network
 
